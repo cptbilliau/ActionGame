@@ -50,12 +50,12 @@ class ACTIONGAME_API ABaseAbility : public AActor
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
 	float BaseDamage;
 
-	float AbilityDamage;
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
 	float BaseHealing;
 
-	float AbilityHealing;
+	
 	
 	bool bDoesHeal;
 
@@ -80,30 +80,44 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAbilityDamageType DamageType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
 	float BaseCooldown;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
 	float DevotionScaling;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
 	float MightScaling;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
 	float MagicScaling;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Ability Stats|Scaling")
+	float MagicHealScaling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
+	float DevotionHealScaling;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UTexture2D* SkillImage;
 
-	UPROPERTY( BlueprintReadWrite, Category = "Ability Stats", meta = (ExposeOnSpawn=true))
+	UPROPERTY( BlueprintReadWrite, meta = (ExposeOnSpawn=true))
 	TMap<EPlayerStats, float> OwningPlayerStatMap;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	void GetAbilityDamage(float& DamageOut);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	void GetAbilityHealing(float& HealingOut);
+	
 	void OnConstruction(const FTransform& Transform) override;
 protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UProjectileMovementComponent* ProjectileMovement;
 

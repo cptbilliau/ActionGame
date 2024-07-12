@@ -11,8 +11,11 @@ ABaseAbility::ABaseAbility()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
+	
 	Lifetime = 20.0f;
 }
+
+
 
 void ABaseAbility::OnConstruction(const FTransform& Transform)
 {
@@ -38,23 +41,26 @@ void ABaseAbility::BeginPlay()
 }
 
 
-void ABaseAbility::SetAbilityValues()
+
+void ABaseAbility::GetAbilityDamage(float& DamageOut)
+{
+	float PlayerDevotion = *OwningPlayerStatMap.Find(EPlayerStats::E_Devotion);
+	float PlayerMight = *OwningPlayerStatMap.Find(EPlayerStats::E_Might);
+	float PlayerMagic = *OwningPlayerStatMap.Find(EPlayerStats::E_Magic);
+	
+	DamageOut = BaseDamage+(PlayerDevotion*DevotionScaling/100)+(PlayerMagic*MagicScaling/100)+(PlayerMight*MightScaling/100);
+
+}
+
+void ABaseAbility::GetAbilityHealing(float& HealingOut)
 {
 	float PlayerDevotion = *OwningPlayerStatMap.Find(EPlayerStats::E_Devotion);
 	float PlayerMight = *OwningPlayerStatMap.Find(EPlayerStats::E_Might);
 	float PlayerMagic = *OwningPlayerStatMap.Find(EPlayerStats::E_Magic);
 
-	if (bDoesHeal)
-	{
-		AbilityHealing = BaseHealing ; //equation
-		AbilityDamage = BaseDamage; //equation
-	}
-	else
-	{
-		AbilityDamage = BaseDamage; //equation
-	}
-	
+	HealingOut = BaseHealing+(PlayerDevotion*DevotionHealScaling/100)+(PlayerMagic*MagicHealScaling/100);
 }
+
 
 // Called every frame
 void ABaseAbility::Tick(float DeltaTime)
