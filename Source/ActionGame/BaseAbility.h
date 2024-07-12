@@ -1,0 +1,116 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "Components/Image.h"
+#include "StatStruct.h"
+#include "BaseAbility.generated.h"
+
+UENUM(BlueprintType)
+enum class EAbilityType : uint8
+{
+	E_NONE UMETA(DisplayName = "NONE"),
+	E_Projectile UMETA(DisplayName = "Projectile"),
+	E_Melee UMETA(DisplayName = "Melee"),
+	E_AOE UMETA(DisplayName = "AOE")
+};
+
+UENUM(BlueprintType)
+enum class EAbilityTargetType :uint8
+{
+	E_NONE UMETA(DisplayName = "None"),
+	E_Enemies UMETA(DisplayName = "Enemy"),
+	E_Allies UMETA(DisplayName = "Allies"),
+	E_AlliesAndEnemies UMETA(DisplayName = "Allies & Enemies")
+};
+
+UENUM(BlueprintType)
+enum class EAbilityDamageType :uint8
+{
+	E_NONE UMETA(DisplayName = "None"),
+	E_Physical UMETA(DisplayName = "Physical"),
+	E_Magical UMETA(DisplayName = "Magical"),
+};
+
+class UProjectileMovementComponent;
+UCLASS()
+class ACTIONGAME_API ABaseAbility : public AActor
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float Speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float ProjectileSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float BaseDamage;
+
+	float AbilityDamage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float BaseHealing;
+
+	float AbilityHealing;
+	
+	bool bDoesHeal;
+
+	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float EnergyCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float Lifetime;
+	
+public:	
+	// Sets default values for this actor's properties
+	ABaseAbility();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EAbilityType AbilityType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EAbilityTargetType AbilityTargetType;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EAbilityDamageType DamageType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float BaseCooldown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float DevotionScaling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float MightScaling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	float MagicScaling;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	UTexture2D* SkillImage;
+
+	UPROPERTY( BlueprintReadWrite, Category = "Ability Stats", meta = (ExposeOnSpawn=true))
+	TMap<EPlayerStats, float> OwningPlayerStatMap;
+
+	void OnConstruction(const FTransform& Transform) override;
+protected:
+	
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UProjectileMovementComponent* ProjectileMovement;
+
+	void SetAbilityValues();
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	
+};
