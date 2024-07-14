@@ -98,8 +98,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
 	float DevotionHealScaling;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Assets", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* SkillImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Assets", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* AbilityAnim;
 
 	UPROPERTY( BlueprintReadWrite, meta = (ExposeOnSpawn=true))
 	TMap<EPlayerStats, float> OwningPlayerStatMap;

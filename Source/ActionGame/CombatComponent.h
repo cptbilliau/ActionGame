@@ -119,7 +119,7 @@ protected:
 	void ModifyCurrentStatValue(EPlayerStats Stat, float InStat);
 
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent | Stats")
-	void TakeDamage(EPlayerStats Stat, float InDamage, TSubclassOf<UDamageType> DamageType);
+	void TakeDamage(float InDamage, TSubclassOf<UDamageType> DamageType, float& DamageTaken);
 
 #pragma endregion
 
