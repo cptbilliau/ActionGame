@@ -25,3 +25,24 @@ void ABaseItem::Tick(float DeltaTime)
 
 }
 
+void ABaseItem::CalculateStatValue(EItemStats inStatType, float minPercent, float maxPercent, int ItemLevel,
+	float& outStatValue, float& outPercentage)
+{
+	//Find map values
+	float StatCoefficient = *StatCoefficientMap.Find(inStatType);
+	float StatBase = *StatBaseMap.Find(inStatType);
+
+	//Get random percent value
+	float randomPercentValue = FMath::FRandRange(minPercent, maxPercent);
+
+	float StatValue = ((randomPercentValue / 33) * (StatCoefficient * (ItemLevel/2 + 1)) + (StatBase * ItemLevel / 5)) + StatBase;
+	
+	//Calculate stat value
+	outStatValue = StatValue;
+	
+	//Set Output Percentage
+	outPercentage = randomPercentValue;
+}
+
+
+
