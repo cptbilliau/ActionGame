@@ -8,6 +8,17 @@
  * 
  */
 UENUM(BlueprintType)
+enum class EAbilitySlot : uint8
+{
+	E_NONE UMETA(DisplayName = "NONE"),
+	E_BasicAttack UMETA(DisplayName = "Basic Attack"),
+	E_Slot1 UMETA(DisplayName = "Slot 1"),
+	E_Slot2 UMETA(DisplayName = "Slot 2"),
+	E_Slot3 UMETA(DisplayName = "Slot 3"),
+	E_MovementSlot UMETA(DisplayName = "Movement Ability"),
+};
+
+UENUM(BlueprintType)
 enum class EItemStats : uint8
 {
 	E_HP UMETA(DisplayName = "HP"),

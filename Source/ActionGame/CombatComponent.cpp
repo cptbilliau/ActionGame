@@ -21,11 +21,6 @@ UCombatComponent::UCombatComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
    PrimaryComponentTick.bCanEverTick = true;
-//	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-//	//PlayerStatMap.Add(EPlayerStats::E_HP);
-//	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-//	//PlayerStatMap.Add(EPlayerStats::E_Dexterity);
-//	// ...
 }
 
 
@@ -40,7 +35,7 @@ void UCombatComponent::BeginPlay()
 }
 
 
-void UCombatComponent::SetAbilityOnCooldown(TSubclassOf<ABaseAbility> InAbility, EAbilitySlot slot, TSubclassOf<ABaseAbility>& OutAbility)
+void UCombatComponent::SetAbilityOnCooldown(float inCooldown, EAbilitySlot slot)
 {
 	
 	
@@ -59,7 +54,7 @@ void UCombatComponent::SetAbilityOnCooldown(TSubclassOf<ABaseAbility> InAbility,
 		{
 			float PlayerDex = CurrentPlayerStatMap[EPlayerStats::E_Dexterity];
 			//Calculate Real Cooldown
-			RealCooldown = InAbility->GetDefaultObject<ABaseBasicAttack>()->BaseCooldown * (100 / (100 + PlayerDex));
+			RealCooldown = inCooldown * (100 / (100 + PlayerDex));
 
 			GetWorld()->GetTimerManager().SetTimer(BasicAttackCooldown, Delagate, RealCooldown, true);
 		}
@@ -69,21 +64,15 @@ void UCombatComponent::SetAbilityOnCooldown(TSubclassOf<ABaseAbility> InAbility,
 
 		//SetSlot1Cooldowntimer
 
-		GetWorld()->GetTimerManager().SetTimer(Slot1Cooldown, Delagate, 
-			//Cooldown Reduction Equation (Get a reference to player first)
-			InAbility->GetDefaultObject<ABaseSkill>()->BaseCooldown
-
-			, true);
-
-
+		GetWorld()->GetTimerManager().SetTimer(Slot1Cooldown, Delagate, inCooldown, true);
 		break;
 	case EAbilitySlot::E_Slot2:
 		//SetSlot2Cooldowntimer
-		GetWorld()->GetTimerManager().SetTimer(Slot2Cooldown, Delagate, InAbility->GetDefaultObject<ABaseSkill>()->BaseCooldown, true);
+		GetWorld()->GetTimerManager().SetTimer(Slot2Cooldown, Delagate, inCooldown, true);
 		break;
 	case EAbilitySlot::E_Slot3:
 		//SetSlot3Cooldowntimer
-		GetWorld()->GetTimerManager().SetTimer(Slot3Cooldown, Delagate, InAbility->GetDefaultObject<ABaseSkill>()->BaseCooldown, true);
+		GetWorld()->GetTimerManager().SetTimer(Slot3Cooldown, Delagate, inCooldown, true);
 		break;
 	case EAbilitySlot::E_MovementSlot:
 		//SetMovementSlotCooldown
@@ -129,7 +118,7 @@ void UCombatComponent::GetAbilityCooldownTimer(EAbilitySlot slot, float& TimeLef
 	
 }
 
-void UCombatComponent::GetAbilityBySlot(EAbilitySlot slot, TSubclassOf<ABaseAbility>& OutAbility) const
+void UCombatComponent::GetAbilityBySlot(EAbilitySlot slot, TSubclassOf<ABaseAbility>& OutAbility)
 {
 	switch (slot)
 	{

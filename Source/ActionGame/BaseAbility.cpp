@@ -30,14 +30,7 @@ void ABaseAbility::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(BaseHealing > 0)
-	{
-		bDoesHeal = true;
-	}
-	else
-	{
-		bDoesHeal = false;
-	}
+	
 }
 
 

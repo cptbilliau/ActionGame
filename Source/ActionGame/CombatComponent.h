@@ -17,19 +17,6 @@
 #include "CombatComponent.generated.h"
 
 
-
-
-UENUM(BlueprintType)
-enum class EAbilitySlot : uint8
-{
-	E_NONE UMETA(DisplayName = "NONE"),
-	E_BasicAttack UMETA(DisplayName = "Basic Attack"),
-	E_Slot1 UMETA(DisplayName = "Slot 1"),
-	E_Slot2 UMETA(DisplayName = "Slot 2"),
-	E_Slot3 UMETA(DisplayName = "Slot 3"),
-	E_MovementSlot UMETA(DisplayName = "Movement Ability"),
-};
-
 UENUM(BlueprintType)
 enum class EPlayerClass : uint8
 {
@@ -74,13 +61,13 @@ protected:
 	
 #pragma region Ability Functions
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent | Abilities")
-	void SetAbilityOnCooldown(TSubclassOf<ABaseAbility> InAbility, EAbilitySlot slot, TSubclassOf<ABaseAbility>& OutAbility);
+	void SetAbilityOnCooldown(float inCooldown, EAbilitySlot slot);
 
 	UFUNCTION(BlueprintPure, Category = "CombatComponent | Abilities")
 	void GetAbilityCooldownTimer(EAbilitySlot slot, float& TimeLeft) const;
 
 	UFUNCTION(BlueprintPure, Category = "CombatComponent | Abilities")
-	void GetAbilityBySlot(EAbilitySlot slot, TSubclassOf<ABaseAbility>& OutAbility) const;
+	void GetAbilityBySlot(EAbilitySlot slot, TSubclassOf<ABaseAbility>& OutAbility);
 
 	UFUNCTION(BlueprintPure, Category = "CombatComponent | Abilities")
 	void GetAbilityImageBySlot(EAbilitySlot slot, UTexture2D*& OutImage);

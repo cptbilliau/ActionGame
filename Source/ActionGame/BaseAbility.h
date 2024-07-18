@@ -9,6 +9,8 @@
 #include "StatStruct.h"
 #include "BaseAbility.generated.h"
 
+enum class EAbilitySlot : uint8;
+
 UENUM(BlueprintType)
 enum class EAbilityType : uint8
 {
@@ -40,32 +42,8 @@ UCLASS()
 class ACTIONGAME_API ABaseAbility : public AActor
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
-	float Speed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
-	float ProjectileSize;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
-	float BaseDamage;
-
 	
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
-	float BaseHealing;
 
-	
-	
-	bool bDoesHeal;
-
-	
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
-	float EnergyCost;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
-	float Lifetime;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -80,22 +58,43 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAbilityDamageType DamageType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats ", meta = (AllowPrivateAccess = "true"))
 	float BaseCooldown;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
-	float DevotionScaling;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), meta = (ExposeOnSpawn=true))
+	EAbilitySlot AttachedSlot;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float Speed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float ProjectileSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float BaseDamage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float BaseHealing;	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float EnergyCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float Lifetime;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Scaling", meta = (AllowPrivateAccess = "true"))
 	float MightScaling;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Scaling", meta = (AllowPrivateAccess = "true"))
 	float MagicScaling;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Ability Stats|Scaling")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Scaling", meta = (AllowPrivateAccess = "true"))
+	float DevotionScaling;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Ability Stats | Scaling", meta = (AllowPrivateAccess = "true"))
 	float MagicHealScaling;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats|Scaling")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Scaling", meta = (AllowPrivateAccess = "true"))
 	float DevotionHealScaling;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Assets", meta = (AllowPrivateAccess = "true"))
