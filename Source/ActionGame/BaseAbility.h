@@ -58,6 +58,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAbilityDamageType DamageType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString Name;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats ", meta = (AllowPrivateAccess = "true"))
 	float BaseCooldown;
 
@@ -69,6 +72,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
 	float ProjectileSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float Range;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
 	float BaseDamage;

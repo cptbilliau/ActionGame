@@ -143,7 +143,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStats ")
 	TMap<EPlayerStats, float> CurrentPlayerStatMap;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
+	TMap<TSoftClassPtr<ABaseSkill>, int> SkillLevelMap;
 
 
 private:
