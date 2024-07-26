@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "BaseBasicAttack.h"
 #include "ActionGameCharacter.h"
+#include "Chaos/Deformable/Utilities.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 
@@ -239,8 +240,11 @@ void UCombatComponent::ModifyBaseStatValue(EPlayerStats inStat, float ModifyBy)
 {
 	FStatStruct* Stat = PlayerStatMap.Find(inStat);
 	
-	Stat->base = Stat->base + ModifyBy;
+	float value = Stat->base + ModifyBy;
 
+	float ClampedValue = FMath::Clamp(value, 0.0f, GetMaxStatValue(inStat));
+	
+	Stat->base = ClampedValue;
 	PlayerStatMap.Add(inStat, *Stat);
 
 	BaseStatChanged.Broadcast(inStat, ModifyBy);
@@ -248,11 +252,9 @@ void UCombatComponent::ModifyBaseStatValue(EPlayerStats inStat, float ModifyBy)
 
 void UCombatComponent::ModifyCurrentStatValue(EPlayerStats Stat, float InReduction)
 {
-	FStatStruct PlayerStat = PlayerStatMap[Stat];
-			
 	float value = GetCurrentStatValue(Stat) + InReduction;
 
-	float ClampedValue = FMath::Clamp(value, 0.0f, GetBaseStatValue(Stat));
+	float ClampedValue = FMath::Clamp(value, 0.0f, GetMaxStatValue(Stat));
 	
 	SetCurrentStatValue(Stat, ClampedValue);
 }
@@ -400,14 +402,6 @@ float UCombatComponent::GetCurrentStatValue(EPlayerStats Stat)
 		else
 			return 0.0f;
 		break;
-	case EPlayerStats::E_EXP:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_EXP))
-		{
-			return CurrentPlayerStatMap[EPlayerStats::E_EXP];
-		}
-		else
-			return 0.0f;
-		break;
 	default:
 		return 0.0f;
 		break;
@@ -418,15 +412,94 @@ float UCombatComponent::GetCurrentStatValue(EPlayerStats Stat)
 float UCombatComponent::GetMaxStatValue(EPlayerStats Stat)
 {
 
-	if (PlayerStatMap.Contains(Stat))
+	switch (Stat)
 	{
-		FStatStruct PlayerStat = PlayerStatMap[Stat];
-		return PlayerStat.max;
-	}
-	else
-	{
+	case EPlayerStats::E_HP:
+		if (PlayerStatMap.Contains(EPlayerStats::E_HP))
+		{
+			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_HP];
+			return PlayerEnergy.max;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_Energy:
+		if (PlayerStatMap.Contains(EPlayerStats::E_Energy))
+		{
+			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Energy];
+			return PlayerEnergy.max;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_Speed:
+		if (PlayerStatMap.Contains(EPlayerStats::E_Speed))
+		{
+			FStatStruct PlayerDex = PlayerStatMap[EPlayerStats::E_Speed];
+			return PlayerDex.max;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_Dexterity:
+		if (PlayerStatMap.Contains(EPlayerStats::E_Dexterity))
+		{
+			FStatStruct PlayerDex = PlayerStatMap[EPlayerStats::E_Dexterity];
+			return PlayerDex.max;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_Might:
+		if (PlayerStatMap.Contains(EPlayerStats::E_Might))
+		{
+			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Might];
+			return PlayerEnergy.max;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_Magic:
+		if (PlayerStatMap.Contains(EPlayerStats::E_Magic))
+		{
+			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Magic];
+			return PlayerEnergy.max;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_Devotion:
+		if (PlayerStatMap.Contains(EPlayerStats::E_Devotion))
+		{
+			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Devotion];
+			return PlayerEnergy.max;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_Armour:
+		if (PlayerStatMap.Contains(EPlayerStats::E_Armour))
+		{
+			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Armour];
+			return PlayerEnergy.max;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_Resistance:
+		if (PlayerStatMap.Contains(EPlayerStats::E_Resistance))
+		{
+			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Resistance];
+			return PlayerEnergy.max;
+		}
+		else
+			return 0.0f;
+		break;
+	default:
 		return 0.0f;
+		break;
 	}
+
 }
 
 float UCombatComponent::GetBaseStatValue(EPlayerStats Stat)
@@ -509,15 +582,6 @@ float UCombatComponent::GetBaseStatValue(EPlayerStats Stat)
 		if (PlayerStatMap.Contains(EPlayerStats::E_Resistance))
 		{
 			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Resistance];
-			return PlayerEnergy.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_EXP:
-		if (PlayerStatMap.Contains(EPlayerStats::E_EXP))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_EXP];
 			return PlayerEnergy.base;
 		}
 		else
