@@ -252,8 +252,8 @@ void UCombatComponent::ModifyCurrentStatValue(EPlayerStats Stat, float InReducti
 			
 	float value = GetCurrentStatValue(Stat) + InReduction;
 
-	float ClampedValue = FMath::Clamp(value, 0, GetBaseStatValue(Stat));
-		
+	float ClampedValue = FMath::Clamp(value, 0.0f, GetBaseStatValue(Stat));
+	
 	SetCurrentStatValue(Stat, ClampedValue);
 }
 
@@ -272,7 +272,7 @@ void UCombatComponent::TakeDamage(float InDamage, TSubclassOf<UDamageType> Damag
 		float calculatedDamage = ((100 * InDamage)/(playerResistance + 100));
 		float value = GetCurrentStatValue(EPlayerStats::E_HP) - calculatedDamage;
 
-		float ClampedValue = FMath::Clamp(value, 0, GetBaseStatValue(EPlayerStats::E_HP));
+		float ClampedValue = FMath::Clamp(value, 0.0f, GetBaseStatValue(EPlayerStats::E_HP));
 		DamageTaken = calculatedDamage;
 		SetCurrentStatValue(EPlayerStats::E_HP, ClampedValue);
 			
@@ -286,7 +286,7 @@ void UCombatComponent::TakeDamage(float InDamage, TSubclassOf<UDamageType> Damag
 		float calculatedDamage = ((100 * InDamage)/(playerArmour + 100));
 		float value = GetCurrentStatValue(EPlayerStats::E_HP) - calculatedDamage;
 		
-		float ClampedValue = FMath::Clamp(value, 0, GetBaseStatValue(EPlayerStats::E_HP));
+		float ClampedValue = FMath::Clamp(value, 0.0f, GetBaseStatValue(EPlayerStats::E_HP));
 		DamageTaken = calculatedDamage;
 		SetCurrentStatValue(EPlayerStats::E_HP, ClampedValue);
 
@@ -297,7 +297,7 @@ void UCombatComponent::TakeDamage(float InDamage, TSubclassOf<UDamageType> Damag
 		//need to add amour calculation
 		float value = GetCurrentStatValue(EPlayerStats::E_HP) + InDamage;
 		
-		float ClampedValue = FMath::Clamp(value, 0, GetBaseStatValue(EPlayerStats::E_HP));
+		float ClampedValue = FMath::Clamp(value, 0.0f, GetBaseStatValue(EPlayerStats::E_HP));
 
 		DamageTaken = InDamage;
 		SetCurrentStatValue(EPlayerStats::E_HP, ClampedValue);
@@ -396,6 +396,14 @@ float UCombatComponent::GetCurrentStatValue(EPlayerStats Stat)
 		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Resistance))
 		{
 			return CurrentPlayerStatMap[EPlayerStats::E_Resistance];
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_EXP:
+		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_EXP))
+		{
+			return CurrentPlayerStatMap[EPlayerStats::E_EXP];
 		}
 		else
 			return 0.0f;
@@ -501,6 +509,15 @@ float UCombatComponent::GetBaseStatValue(EPlayerStats Stat)
 		if (PlayerStatMap.Contains(EPlayerStats::E_Resistance))
 		{
 			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Resistance];
+			return PlayerEnergy.base;
+		}
+		else
+			return 0.0f;
+		break;
+	case EPlayerStats::E_EXP:
+		if (PlayerStatMap.Contains(EPlayerStats::E_EXP))
+		{
+			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_EXP];
 			return PlayerEnergy.base;
 		}
 		else
