@@ -45,7 +45,7 @@ enum class EPlayerStats : uint8
 	E_Devotion UMETA(DisplayName = "Devotion"),
 	E_Armour UMETA(DisplayName = "Armour"),
 	E_Resistance UMETA(DisplayName = "Resistance"),
-	E_EXP UMETA(DisplayName = "Experience"),
+	E_EXP UMETA(DisplayName = "EXP"),
 };
 
 USTRUCT(BlueprintType)

@@ -231,7 +231,7 @@ void UCombatComponent::SetBaseStatValue(EPlayerStats Stat, float inStat)
 	FStatStruct* PlayerStat = PlayerStatMap.Find(Stat);
 
 	PlayerStat->base = inStat;
-
+	
 	PlayerStatMap.Add(Stat, *PlayerStat);
 
 }
