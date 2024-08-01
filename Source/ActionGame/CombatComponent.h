@@ -10,9 +10,13 @@
 #include "ActionGameCharacter.h"
 #include "StatStruct.h"
 #include "AbilityDamage.h"
+#include "BaseMovementSkill.h"
 #include "StatStruct.h"
 #include "GameFramework/DamageType.h"
 #include "Delegates/DelegateCombinations.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
+
 
 #include "CombatComponent.generated.h"
 
@@ -21,8 +25,21 @@ UENUM(BlueprintType)
 enum class EPlayerClass : uint8
 {
 	E_Caster UMETA(DisplayName = "Caster"),
-	E_Warrior UMETA(DisplayName = "Warrior"),
-	E_Rogue UMETA(DisplayName = "Rogue"),
+	E_Brawler UMETA(DisplayName = "Brawler"),
+	E_Duelist UMETA(DisplayName = "Duelist"),
+};
+
+
+USTRUCT()
+struct FReplicatedBaseStat_Stat_Float_Float
+{
+	UPROPERTY()
+	EPlayerStats Stat;
+	UPROPERTY()
+	float currentStat;
+	
+	GENERATED_BODY()
+	
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCurrentStatChanged, EPlayerStats, outStat, float, outFloat);
@@ -54,7 +71,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AbilityObjects | StoredAbility")
 	TArray<TSubclassOf<ABaseAbility>> CachedAbilities;
@@ -67,7 +84,7 @@ protected:
 	void GetAbilityCooldownTimer(EAbilitySlot slot, float& TimeLeft) const;
 
 	UFUNCTION(BlueprintPure, Category = "CombatComponent | Abilities")
-	void GetAbilityBySlot(EAbilitySlot slot, TSubclassOf<ABaseAbility>& OutAbility);
+	TSubclassOf<ABaseAbility> GetAbilityBySlot(EAbilitySlot slot) const;
 
 	UFUNCTION(BlueprintPure, Category = "CombatComponent | Abilities")
 	void GetAbilityImageBySlot(EAbilitySlot slot, UTexture2D*& OutImage);
@@ -119,16 +136,19 @@ public:
 	
 	
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AbilityObjects | Basic")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "AbilityObjects | Basic")
 	TSoftClassPtr<ABaseBasicAttack> BasicAttack;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AbilityObjects | Skills")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "AbilityObjects | Movement")
+	TSoftClassPtr<ABaseMovementSkill> MovementSkill;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "AbilityObjects | Skills")
 	TSoftClassPtr<ABaseSkill> SkillSlot1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AbilityObjects | Skills")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "AbilityObjects | Skills")
 	TSoftClassPtr<ABaseSkill> SkillSlot2;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AbilityObjects | Skills")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "AbilityObjects | Skills")
 	TSoftClassPtr<ABaseSkill> SkillSlot3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStats | Class")
@@ -146,7 +166,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
 	TMap<TSoftClassPtr<ABaseSkill>, int> SkillLevelMap;
 
+	UFUNCTION()
+	void OnRep_MapWorkaround();
 
+		
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MapWorkaround)
+	TArray<FReplicatedCurrentStat_Stat_Float> MapCurrentStatWorkaroundArray;
+
+	void ReplicateMapAndSetWorkAround();
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void HandleAbilityUsage(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner, const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats);
+
+	
 private:
 	
 	

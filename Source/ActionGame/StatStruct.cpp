@@ -26,5 +26,12 @@ FEquipmentStatStruct::~FEquipmentStatStruct()
 {
 	
 }
-
+FReplicatedCurrentStat_Stat_Float::FReplicatedCurrentStat_Stat_Float()
+{
+	
+}
+FReplicatedCurrentStat_Stat_Float::~FReplicatedCurrentStat_Stat_Float()
+{
+	
+}
 

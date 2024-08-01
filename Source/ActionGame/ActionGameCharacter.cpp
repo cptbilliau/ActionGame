@@ -25,12 +25,13 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AActionGameCharacter::AActionGameCharacter()
 {
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
@@ -68,7 +69,8 @@ void AActionGameCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-
+	
+	SetActorTickEnabled(true);
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -82,7 +84,7 @@ void AActionGameCharacter::BeginPlay()
 }
 void AActionGameCharacter::Tick(float DeltaTime)
 {
-	
+
 
 }
 
@@ -109,6 +111,7 @@ void AActionGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
+
 
 void AActionGameCharacter::Move(const FInputActionValue& Value)
 {

@@ -89,16 +89,11 @@ void AActionGamePlayerController::Tick(float DeltaTime)
 
 	if (ControlledPawn != nullptr)
 	{
-		ControlledPawn->bUseControllerRotationYaw = true;
+		
 		FVector PlayerLoc = ControlledPawn->GetActorLocation();
 		ControlledPawn->FaceRotation(UKismetMathLibrary::FindLookAtRotation(PlayerLoc, CachedLookDestination));
 		//ControlledPawn->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(PlayerLoc, CachedLookDestination));
-		
-
-
-		
 	}
-	
 
 }
 

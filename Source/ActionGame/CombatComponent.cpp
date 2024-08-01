@@ -8,17 +8,20 @@
 #include "Chaos/Deformable/Utilities.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
+#include "Net/Core/PushModel/PushModel.h"
 
 FTimerHandle BasicAttackCooldown;
 FTimerHandle Slot1Cooldown;
 FTimerHandle Slot2Cooldown;
 FTimerHandle Slot3Cooldown;
+FTimerHandle MovementCooldown;
 struct FStatStruct;
 class UDamageType;
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
 {
+	
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
    PrimaryComponentTick.bCanEverTick = true;
@@ -32,6 +35,64 @@ void UCombatComponent::BeginPlay()
 
 	
 	// ...
+	
+}
+
+void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams SharedParams;
+	SharedParams.bIsPushBased = true;
+	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, MapCurrentStatWorkaroundArray, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, BasicAttack, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, MovementSkill, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, SkillSlot1, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, SkillSlot2, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, SkillSlot3, SharedParams);
+}
+
+void UCombatComponent::OnRep_MapWorkaround()
+{
+	CurrentPlayerStatMap.Reset();
+	for (const FReplicatedCurrentStat_Stat_Float& ReplicateMapEntry : MapCurrentStatWorkaroundArray)
+	{
+		CurrentPlayerStatMap.Emplace(ReplicateMapEntry.Stat, ReplicateMapEntry.currentStat);
+	}
+}
+
+void UCombatComponent::ReplicateMapAndSetWorkAround()
+{
+	MapCurrentStatWorkaroundArray.Reset();
+	const TArray<TPair<EPlayerStats, float>>& PairArray = CurrentPlayerStatMap.Array();
+	for (const TPair<EPlayerStats, float>& Pair : PairArray)
+	{
+		FReplicatedCurrentStat_Stat_Float RepEntry;
+		RepEntry.Stat = Pair.Key;
+		RepEntry.currentStat = Pair.Value;
+		MapCurrentStatWorkaroundArray.Add(MoveTemp(RepEntry));
+	}
+	MARK_PROPERTY_DIRTY_FROM_NAME(UCombatComponent, MapCurrentStatWorkaroundArray, this);
+
+	
+}
+
+void UCombatComponent::HandleAbilityUsage_Implementation(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner,
+	const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats)
+{
+	FActorSpawnParameters spawnParameters;
+	spawnParameters.Owner = GetOwner();
+	TSubclassOf<ABaseAbility> AbilityToSpawn = GetAbilityBySlot(AttachedSlot);
+	ABaseAbility* SpawnedAbility = GetWorld()->SpawnActorDeferred<ABaseAbility>(AbilityToSpawn, SpawnTransform, Owner,
+		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+	if(SpawnedAbility)
+	{
+		SpawnedAbility->AttachedSlot = AttachedSlot;
+		SpawnedAbility->OwningPlayerStatMap = CurrentPlayerStats;
+		
+		UGameplayStatics::FinishSpawningActor(SpawnedAbility, SpawnTransform);
+	}
 	
 }
 
@@ -76,7 +137,7 @@ void UCombatComponent::SetAbilityOnCooldown(float inCooldown, EAbilitySlot slot)
 		GetWorld()->GetTimerManager().SetTimer(Slot3Cooldown, Delagate, inCooldown, true);
 		break;
 	case EAbilitySlot::E_MovementSlot:
-		//SetMovementSlotCooldown
+		GetWorld()->GetTimerManager().SetTimer(MovementCooldown, Delagate, inCooldown, true);
 		break;
 	}
 	
@@ -113,38 +174,58 @@ void UCombatComponent::GetAbilityCooldownTimer(EAbilitySlot slot, float& TimeLef
 		CooldownTimeRemaining.Broadcast(slot, TimeLeft);
 		break;
 	case EAbilitySlot::E_MovementSlot:
+
+		TimeLeft = GetWorld()->GetTimerManager().GetTimerRemaining(MovementCooldown);
+		CooldownTimeRemaining.Broadcast(slot, TimeLeft);
 		//SetMovementSlotCooldown
 		break;
 	}
 	
 }
 
-void UCombatComponent::GetAbilityBySlot(EAbilitySlot slot, TSubclassOf<ABaseAbility>& OutAbility)
+TSubclassOf<ABaseAbility> UCombatComponent::GetAbilityBySlot(EAbilitySlot slot) const
 {
 	switch (slot)
 	{
 	case EAbilitySlot::E_NONE:
 		//throw error do nothing
-		break;
-	case EAbilitySlot::E_BasicAttack:
+		return nullptr;
 		
-		OutAbility = BasicAttack.LoadSynchronous();
-		break;
-
+	case EAbilitySlot::E_BasicAttack:
+		if (BasicAttack != nullptr)
+		return  BasicAttack.LoadSynchronous();
+		
+		return nullptr;
+		
+		
 	case EAbilitySlot::E_Slot1:
 		//SetSlot1Cooldowntimer
-		OutAbility = SkillSlot1.LoadSynchronous();
-		break;
+			if (SkillSlot1 != nullptr)
+		return SkillSlot1.LoadSynchronous();
+			
+		return nullptr;
+		
+	
 	case EAbilitySlot::E_Slot2:
-		OutAbility = SkillSlot2.LoadSynchronous();
+		if(SkillSlot2 != nullptr)
+		return SkillSlot2.LoadSynchronous();
+		
+			return nullptr;
+		
 		break;
 	case EAbilitySlot::E_Slot3:
-		OutAbility = SkillSlot3.LoadSynchronous();
-		break;
+		if(SkillSlot3 != nullptr)
+		return SkillSlot3.LoadSynchronous();
+		
+		return nullptr;
+
 	case EAbilitySlot::E_MovementSlot:
-		//LoadMovementSlot
-		break;
+		if(MovementSkill != nullptr)
+		return MovementSkill.LoadSynchronous();
+	
+		return nullptr;
 	}
+	return nullptr;
 }
 
 void UCombatComponent::GetAbilityImageBySlot(EAbilitySlot slot, UTexture2D*& OutImage)
@@ -173,6 +254,7 @@ void UCombatComponent::GetAbilityImageBySlot(EAbilitySlot slot, UTexture2D*& Out
 		break;
 	case EAbilitySlot::E_MovementSlot:
 		//GetMovementImage
+		OutImage = MovementSkill->GetDefaultObject<ABaseSkill>()->SkillImage;
 		break;
 	}
 
@@ -204,7 +286,7 @@ void UCombatComponent::SetAbilityOffCooldown(EAbilitySlot slot)
 		GetWorld()->GetTimerManager().ClearTimer(Slot3Cooldown);
 		break;
 	case EAbilitySlot::E_MovementSlot:
-		//SetMovementSlotCooldown
+		GetWorld()->GetTimerManager().ClearTimer(MovementCooldown);
 		break;
 	}
 }
@@ -310,9 +392,10 @@ void UCombatComponent::TakeDamage(float InDamage, TSubclassOf<UDamageType> Damag
 void UCombatComponent::SetCurrentStatValue(EPlayerStats Stat, float inStat)
 {
 	CurrentStatChanged.Broadcast(Stat, inStat);
-
+	
 	CurrentPlayerStatMap.Add(Stat, inStat);
-
+	
+	ReplicateMapAndSetWorkAround();
 }
 
 #pragma endregion
@@ -323,276 +406,20 @@ GET STAT
 #pragma region Get Stat
 float UCombatComponent::GetCurrentStatValue(EPlayerStats Stat)
 {
-	switch (Stat)
-	{
-	case EPlayerStats::E_HP:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_HP))
-		{
-
-			return CurrentPlayerStatMap[EPlayerStats::E_HP];
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Energy:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Energy))
-		{
-
-			return CurrentPlayerStatMap[EPlayerStats::E_Energy];
-		}
-		else
-
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Speed:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Speed))
-		{
-			
-			return CurrentPlayerStatMap[EPlayerStats::E_Speed];
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Dexterity:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Dexterity))
-		{
-
-			return CurrentPlayerStatMap[EPlayerStats::E_Dexterity];
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Might:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Might))
-		{
-
-			return CurrentPlayerStatMap[EPlayerStats::E_Might];
-		}
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Magic:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Magic))
-		{
-			return CurrentPlayerStatMap[EPlayerStats::E_Magic];
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Devotion:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Devotion))
-		{
-			return CurrentPlayerStatMap[EPlayerStats::E_Devotion];
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Armour:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Armour))
-		{
-			return CurrentPlayerStatMap[EPlayerStats::E_Armour];
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Resistance:
-		if (CurrentPlayerStatMap.Contains(EPlayerStats::E_Resistance))
-		{
-			return CurrentPlayerStatMap[EPlayerStats::E_Resistance];
-		}
-		else
-			return 0.0f;
-		break;
-	default:
-		return 0.0f;
-		break;
-	}
-
-
+	return CurrentPlayerStatMap[Stat];
 }
 float UCombatComponent::GetMaxStatValue(EPlayerStats Stat)
 {
+	FStatStruct* StatToFind = PlayerStatMap.Find(Stat);
 
-	switch (Stat)
-	{
-	case EPlayerStats::E_HP:
-		if (PlayerStatMap.Contains(EPlayerStats::E_HP))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_HP];
-			return PlayerEnergy.max;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Energy:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Energy))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Energy];
-			return PlayerEnergy.max;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Speed:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Speed))
-		{
-			FStatStruct PlayerDex = PlayerStatMap[EPlayerStats::E_Speed];
-			return PlayerDex.max;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Dexterity:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Dexterity))
-		{
-			FStatStruct PlayerDex = PlayerStatMap[EPlayerStats::E_Dexterity];
-			return PlayerDex.max;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Might:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Might))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Might];
-			return PlayerEnergy.max;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Magic:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Magic))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Magic];
-			return PlayerEnergy.max;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Devotion:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Devotion))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Devotion];
-			return PlayerEnergy.max;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Armour:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Armour))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Armour];
-			return PlayerEnergy.max;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Resistance:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Resistance))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Resistance];
-			return PlayerEnergy.max;
-		}
-		else
-			return 0.0f;
-		break;
-	default:
-		return 0.0f;
-		break;
-	}
-
+	return StatToFind->max;
 }
 
 float UCombatComponent::GetBaseStatValue(EPlayerStats Stat)
 {
-	switch (Stat)
-	{
-	case EPlayerStats::E_HP:
-		if (PlayerStatMap.Contains(EPlayerStats::E_HP))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_HP];
-			return PlayerEnergy.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Energy:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Energy))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Energy];
-			return PlayerEnergy.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Speed:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Speed))
-		{
-			FStatStruct PlayerDex = PlayerStatMap[EPlayerStats::E_Speed];
-			return PlayerDex.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Dexterity:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Dexterity))
-		{
-			FStatStruct PlayerDex = PlayerStatMap[EPlayerStats::E_Dexterity];
-			return PlayerDex.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Might:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Might))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Might];
-			return PlayerEnergy.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Magic:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Magic))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Magic];
-			return PlayerEnergy.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Devotion:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Devotion))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Devotion];
-			return PlayerEnergy.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Armour:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Armour))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Armour];
-			return PlayerEnergy.base;
-		}
-		else
-			return 0.0f;
-		break;
-	case EPlayerStats::E_Resistance:
-		if (PlayerStatMap.Contains(EPlayerStats::E_Resistance))
-		{
-			FStatStruct PlayerEnergy = PlayerStatMap[EPlayerStats::E_Resistance];
-			return PlayerEnergy.base;
-		}
-		else
-			return 0.0f;
-		break;
-	default:
-		return 0.0f;
-		break;
-	}
+	FStatStruct* StatToFind = PlayerStatMap.Find(Stat);
 
-
+	return StatToFind->base;
 }
 
 

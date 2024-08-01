@@ -41,7 +41,13 @@ class ACTIONGAME_API ABaseSkill : public ABaseAbility
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Level")
     float CooldownReductionPerLevel;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Level")
+	float RadiusPerLevel;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Level")
+	float RangePerLevel;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Level")
 	TArray<FString> SkillDescriptionPerLevel;
 

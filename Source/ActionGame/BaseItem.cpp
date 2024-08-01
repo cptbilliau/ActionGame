@@ -25,7 +25,7 @@ void ABaseItem::Tick(float DeltaTime)
 
 }
 
-void ABaseItem::CalculateStatValue(EItemStats inStatType, float minPercent, float maxPercent, int ItemLevel,
+void ABaseItem::CalculateStatValue(EPlayerStats inStatType, float minPercent, float maxPercent, int ItemLevel,
 	float& outStatValue, float& outPercentage)
 {
 	//Find map values

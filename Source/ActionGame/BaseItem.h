@@ -23,15 +23,15 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat Maps")
-	TMap<EItemStats, float> StatCoefficientMap;
+	TMap<EPlayerStats, float> StatCoefficientMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat Maps")
-	TMap<EItemStats, float> StatBaseMap;
+	TMap<EPlayerStats, float> StatBaseMap;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
-	void CalculateStatValue(EItemStats inStatType, float minPercent, float maxPercent, int ItemLevel, float& outStatValue, float& outPercentage);
+	void CalculateStatValue(EPlayerStats  inStatType, float minPercent, float maxPercent, int ItemLevel, float& outStatValue, float& outPercentage);
 };

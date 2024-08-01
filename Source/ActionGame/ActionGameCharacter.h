@@ -61,9 +61,9 @@ protected:
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
-
-	/** Called for looking input */
 	
+	/** Called for looking input */
+	void LookAt(FVector LookAtRotation);
 
 	/*void BasicAttack();
 

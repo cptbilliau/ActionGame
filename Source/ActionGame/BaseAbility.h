@@ -60,12 +60,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FString Name;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats ", meta = (AllowPrivateAccess = "true"))
-	float BaseCooldown;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), meta = (ExposeOnSpawn=true))
-	EAbilitySlot AttachedSlot;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
 	float Speed;
@@ -75,6 +69,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
 	float Range;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float Radius;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
+	float BaseCooldown;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
 	float BaseDamage;
@@ -98,7 +98,7 @@ public:
 	float DevotionScaling;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Ability Stats | Scaling", meta = (AllowPrivateAccess = "true"))
-	float MagicHealScaling;
+ 	float MagicHealScaling;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Scaling", meta = (AllowPrivateAccess = "true"))
 	float DevotionHealScaling;
@@ -109,9 +109,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability Assets", meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* AbilityAnim;
 
-	UPROPERTY( BlueprintReadWrite, meta = (ExposeOnSpawn=true))
-	TMap<EPlayerStats, float> OwningPlayerStatMap;
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn=true))
+	TArray<FReplicatedCurrentStat_Stat_Float> OwningPlayerStatMap;
 
+	UPROPERTY(BlueprintReadWrite, Replicated, meta = (ExposeOnSpawn=true))
+	EAbilitySlot AttachedSlot;
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	void GetAbilityDamage(float& DamageOut);
 
@@ -124,8 +127,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	
-	
+	float PlayerDevotion;
+	float PlayerMight;
+	float PlayerMagic;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UProjectileMovementComponent* ProjectileMovement;
 

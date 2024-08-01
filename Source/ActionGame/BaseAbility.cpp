@@ -2,11 +2,14 @@
 
 
 #include "BaseAbility.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ABaseAbility::ABaseAbility()
 {
+	bReplicates = true;
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -16,6 +19,14 @@ ABaseAbility::ABaseAbility()
 }
 
 
+void ABaseAbility::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	FDoRepLifetimeParams SharedParams;
+	SharedParams.bIsPushBased = true;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ABaseAbility, AttachedSlot, SharedParams);
+	
+}
 
 void ABaseAbility::OnConstruction(const FTransform& Transform)
 {
@@ -31,28 +42,55 @@ void ABaseAbility::BeginPlay()
 	Super::BeginPlay();
 
 	
+	FReplicatedCurrentStat_Stat_Float* FoundPlayerDevotion = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Devotion);
+	if (FoundPlayerDevotion)
+	{
+		PlayerDevotion = FoundPlayerDevotion->currentStat;
+	}
+	else
+	{
+		PlayerDevotion = 0.0f;	
+	}
+	FReplicatedCurrentStat_Stat_Float* FoundPlayerMight = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Might);
+	if(FoundPlayerMight)
+	{
+		PlayerMight = FoundPlayerMight->currentStat;
+	}
+	else
+	{
+		PlayerMight = 0.0f;
+	}
+	FReplicatedCurrentStat_Stat_Float* FoundPlayerMagic = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Magic);
+	if(FoundPlayerMagic)
+	{
+		PlayerMagic = FoundPlayerMagic->currentStat;
+	}
+	else
+	{
+		PlayerMagic = 0.0f;
+	}
 }
 
 
 
 void ABaseAbility::GetAbilityDamage(float& DamageOut)
 {
-	float PlayerDevotion = *OwningPlayerStatMap.Find(EPlayerStats::E_Devotion);
-	float PlayerMight = *OwningPlayerStatMap.Find(EPlayerStats::E_Might);
-	float PlayerMagic = *OwningPlayerStatMap.Find(EPlayerStats::E_Magic);
-	
-	DamageOut = BaseDamage+(PlayerDevotion*DevotionScaling/100)+(PlayerMagic*MagicScaling/100)+(PlayerMight*MightScaling/100);
+	if (GetOwner() != nullptr)
+	{
 
+		DamageOut = BaseDamage+(PlayerDevotion*DevotionScaling/100)+(PlayerMagic*MagicScaling/100)+(PlayerMight*MightScaling/100);
+	}
 }
 
 void ABaseAbility::GetAbilityHealing(float& HealingOut)
 {
-	float PlayerDevotion = *OwningPlayerStatMap.Find(EPlayerStats::E_Devotion);
-	float PlayerMight = *OwningPlayerStatMap.Find(EPlayerStats::E_Might);
-	float PlayerMagic = *OwningPlayerStatMap.Find(EPlayerStats::E_Magic);
-
-	HealingOut = BaseHealing+(PlayerDevotion*DevotionHealScaling/100)+(PlayerMagic*MagicHealScaling/100);
+	if (GetOwner() != nullptr)
+	{
+		HealingOut = BaseHealing+(PlayerDevotion*DevotionHealScaling/100)+(PlayerMagic*MagicHealScaling/100);
+	} 
 }
+
+
 
 
 // Called every frame

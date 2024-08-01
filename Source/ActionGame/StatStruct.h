@@ -19,21 +19,6 @@ enum class EAbilitySlot : uint8
 };
 
 UENUM(BlueprintType)
-enum class EItemStats : uint8
-{
-	E_HP UMETA(DisplayName = "HP"),
-	E_Energy UMETA(DisplayName = "Energy"),
-	E_Speed UMETA(DisplayName = "Speed"),
-	E_Dexterity UMETA(DisplayName = "Dexterity"),
-	E_Might UMETA(DisplayName = "Might"),
-	E_Magic UMETA(DisplayName = "Magic"),
-	E_Devotion UMETA(DisplayName = "Devotion"),
-	E_Armour UMETA(DisplayName = "Armour"),
-	E_Resistance UMETA(DisplayName = "Resistance"),
-	
-};
-
-UENUM(BlueprintType)
 enum class EPlayerStats : uint8
 {
 	E_HP UMETA(DisplayName = "HP"),
@@ -66,7 +51,7 @@ struct ACTIONGAME_API FItemStatStruct
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EItemStats stat;
+	EPlayerStats  stat;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float statValue;
@@ -81,7 +66,7 @@ struct ACTIONGAME_API FEquipmentStatStruct
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EItemStats stat;
+	EPlayerStats stat;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float minPercent;
@@ -91,4 +76,21 @@ struct ACTIONGAME_API FEquipmentStatStruct
 	FEquipmentStatStruct();
 	~FEquipmentStatStruct();
 };
+
+USTRUCT(BlueprintType)
+struct FReplicatedCurrentStat_Stat_Float
+{
+	UPROPERTY()
+	EPlayerStats Stat;
+	UPROPERTY()
+	float currentStat;
+	bool operator==(const EPlayerStats& StatType) const
+	{
+		return Stat == StatType; 
+	}
+	GENERATED_BODY()
+	FReplicatedCurrentStat_Stat_Float();
+	~FReplicatedCurrentStat_Stat_Float();
+};
+
 
