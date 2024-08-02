@@ -46,6 +46,8 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	FDoRepLifetimeParams SharedParams;
 	SharedParams.bIsPushBased = true;
 	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, MapCurrentStatWorkaroundArray, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, StatMapWorkaroundArray, SharedParams);
+	DOREPLIFETIME(UCombatComponent, Team);
 	DOREPLIFETIME(UCombatComponent, BasicAttack);
 	DOREPLIFETIME(UCombatComponent, MovementSkill);
 	DOREPLIFETIME(UCombatComponent, SkillSlot1);
@@ -53,7 +55,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, SkillSlot3);
 }
 
-void UCombatComponent::OnRep_MapWorkaround()
+void UCombatComponent::OnRep_CurrentStatMapWorkaround()
 {
 	CurrentPlayerStatMap.Reset();
 	for (const FReplicatedCurrentStat_Stat_Float& ReplicateMapEntry : MapCurrentStatWorkaroundArray)
@@ -62,7 +64,16 @@ void UCombatComponent::OnRep_MapWorkaround()
 	}
 }
 
-void UCombatComponent::ReplicateMapAndSetWorkAround()
+void UCombatComponent::OnRep_StatMapWorkAround()
+{
+	PlayerStatMap.Reset();
+	for (const FReplicatedBaseStat_Stat_Float& ReplicateMapEntry : StatMapWorkaroundArray)
+	{
+		PlayerStatMap.Emplace(ReplicateMapEntry.Stat, ReplicateMapEntry.BaseStat);
+	}
+}
+
+void UCombatComponent::ReplicateCurrentStatMapWorkAround()
 {
 	MapCurrentStatWorkaroundArray.Reset();
 	const TArray<TPair<EPlayerStats, float>>& PairArray = CurrentPlayerStatMap.Array();
@@ -74,12 +85,27 @@ void UCombatComponent::ReplicateMapAndSetWorkAround()
 		MapCurrentStatWorkaroundArray.Add(MoveTemp(RepEntry));
 	}
 	MARK_PROPERTY_DIRTY_FROM_NAME(UCombatComponent, MapCurrentStatWorkaroundArray, this);
+}
 
+void UCombatComponent::ReplicatePlayerStatMapWorkAround()
+{
+
+	StatMapWorkaroundArray.Reset();
+	const TArray<TPair<EPlayerStats, FStatStruct>>& PairArray = PlayerStatMap.Array();
+	for (const TPair<EPlayerStats, FStatStruct>& Pair : PairArray)
+	{
+		FReplicatedBaseStat_Stat_Float RepEntry;
+		RepEntry.Stat = Pair.Key;
+		RepEntry.BaseStat = Pair.Value;
+		StatMapWorkaroundArray.Add(MoveTemp(RepEntry));
+	}
+	MARK_PROPERTY_DIRTY_FROM_NAME(UCombatComponent, StatMapWorkaroundArray, this);
 	
 }
 
+
 void UCombatComponent::HandleAbilityUsage_Implementation(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner, APawn* Instigator,
-	const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats)
+const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats)
 {
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.Owner = GetOwner();
@@ -291,11 +317,6 @@ void UCombatComponent::SetAbilityOffCooldown(EAbilitySlot slot)
 	}
 }
 
-
-
-
-
-
 #pragma region SetRegion
 
 
@@ -317,6 +338,8 @@ void UCombatComponent::SetBaseStatValue(EPlayerStats Stat, float inStat)
 	
 	PlayerStatMap.Add(Stat, *PlayerStat);
 
+	ReplicatePlayerStatMapWorkAround();
+
 }
 void UCombatComponent::ModifyBaseStatValue(EPlayerStats inStat, float ModifyBy)
 {
@@ -326,9 +349,8 @@ void UCombatComponent::ModifyBaseStatValue(EPlayerStats inStat, float ModifyBy)
 
 	float ClampedValue = FMath::Clamp(value, 0.0f, GetMaxStatValue(inStat));
 	
-	Stat->base = ClampedValue;
-	PlayerStatMap.Add(inStat, *Stat);
-
+	SetBaseStatValue(inStat, ClampedValue);
+		
 	BaseStatChanged.Broadcast(inStat, ModifyBy);
 }	
 
@@ -395,7 +417,7 @@ void UCombatComponent::SetCurrentStatValue(EPlayerStats Stat, float inStat)
 	
 	CurrentPlayerStatMap.Add(Stat, inStat);
 	
-	ReplicateMapAndSetWorkAround();
+	ReplicateCurrentStatMapWorkAround();
 }
 
 #pragma endregion

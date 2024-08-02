@@ -92,5 +92,20 @@ struct FReplicatedCurrentStat_Stat_Float
 	FReplicatedCurrentStat_Stat_Float();
 	~FReplicatedCurrentStat_Stat_Float();
 };
+USTRUCT(BlueprintType)
+struct FReplicatedBaseStat_Stat_Float
+{
+	UPROPERTY()
+	EPlayerStats Stat;
+	UPROPERTY()
+	FStatStruct BaseStat;
+	bool operator==(const EPlayerStats& StatType) const
+	{
+		return Stat == StatType; 
+	}
+	GENERATED_BODY()
+	FReplicatedBaseStat_Stat_Float();
+	~FReplicatedBaseStat_Stat_Float();
+};
 
 

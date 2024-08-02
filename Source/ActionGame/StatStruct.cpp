@@ -35,3 +35,11 @@ FReplicatedCurrentStat_Stat_Float::~FReplicatedCurrentStat_Stat_Float()
 	
 }
 
+FReplicatedBaseStat_Stat_Float::FReplicatedBaseStat_Stat_Float()
+{
+}
+
+FReplicatedBaseStat_Stat_Float::~FReplicatedBaseStat_Stat_Float()
+{
+}
+

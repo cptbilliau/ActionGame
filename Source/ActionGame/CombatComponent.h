@@ -30,17 +30,7 @@ enum class EPlayerClass : uint8
 };
 
 
-USTRUCT()
-struct FReplicatedBaseStat_Stat_Float_Float
-{
-	UPROPERTY()
-	EPlayerStats Stat;
-	UPROPERTY()
-	float currentStat;
-	
-	GENERATED_BODY()
-	
-};
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCurrentStatChanged, EPlayerStats, outStat, float, outFloat);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGetCooldownTimeRemaining, EAbilitySlot, outSlot, float, outFloat);
@@ -154,7 +144,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStats | Class")
 	EPlayerClass PlayerClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Team")
 	int Team;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStats ")
@@ -167,13 +157,20 @@ public:
 	TMap<TSoftClassPtr<ABaseSkill>, int> SkillLevelMap;
 
 	UFUNCTION()
-	void OnRep_MapWorkaround();
+	void OnRep_CurrentStatMapWorkaround();
 
+	UFUNCTION()
+	void OnRep_StatMapWorkAround();
 		
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MapWorkaround)
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CurrentStatMapWorkaround)
 	TArray<FReplicatedCurrentStat_Stat_Float> MapCurrentStatWorkaroundArray;
 
-	void ReplicateMapAndSetWorkAround();
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_StatMapWorkAround)
+	TArray<FReplicatedBaseStat_Stat_Float> StatMapWorkaroundArray;
+
+	void ReplicateCurrentStatMapWorkAround();
+	
+	void ReplicatePlayerStatMapWorkAround();
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void HandleAbilityUsage(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner, APawn* Instigator, const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats);
