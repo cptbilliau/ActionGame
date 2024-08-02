@@ -74,6 +74,7 @@ void AActionGameCharacter::BeginPlay()
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
+		
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
@@ -84,7 +85,16 @@ void AActionGameCharacter::BeginPlay()
 }
 void AActionGameCharacter::Tick(float DeltaTime)
 {
+	
+	AActionGamePlayerController* PlayerController = Cast<AActionGamePlayerController>(Controller);	
 
+
+		
+		if(PlayerController != nullptr)
+		{
+			PlayerController->SetControlRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PlayerController->CachedLookDestination));
+			//ControlledPawn->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(PlayerLoc, CachedLookDestination));
+		}
 
 }
 
@@ -122,7 +132,7 @@ void AActionGameCharacter::Move(const FInputActionValue& Value)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FRotator YawRotation(0, GetActorForwardVector().Y, 0);
 
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);

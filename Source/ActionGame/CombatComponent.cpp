@@ -15,6 +15,7 @@ FTimerHandle Slot1Cooldown;
 FTimerHandle Slot2Cooldown;
 FTimerHandle Slot3Cooldown;
 FTimerHandle MovementCooldown;
+
 struct FStatStruct;
 class UDamageType;
 
@@ -22,7 +23,7 @@ class UDamageType;
 UCombatComponent::UCombatComponent()
 {
 	
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// Set	 this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
    PrimaryComponentTick.bCanEverTick = true;
 }
@@ -45,11 +46,11 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	FDoRepLifetimeParams SharedParams;
 	SharedParams.bIsPushBased = true;
 	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, MapCurrentStatWorkaroundArray, SharedParams);
-	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, BasicAttack, SharedParams);
-	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, MovementSkill, SharedParams);
-	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, SkillSlot1, SharedParams);
-	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, SkillSlot2, SharedParams);
-	DOREPLIFETIME_WITH_PARAMS_FAST(UCombatComponent, SkillSlot3, SharedParams);
+	DOREPLIFETIME(UCombatComponent, BasicAttack);
+	DOREPLIFETIME(UCombatComponent, MovementSkill);
+	DOREPLIFETIME(UCombatComponent, SkillSlot1);
+	DOREPLIFETIME(UCombatComponent, SkillSlot2);
+	DOREPLIFETIME(UCombatComponent, SkillSlot3);
 }
 
 void UCombatComponent::OnRep_MapWorkaround()
@@ -77,14 +78,13 @@ void UCombatComponent::ReplicateMapAndSetWorkAround()
 	
 }
 
-void UCombatComponent::HandleAbilityUsage_Implementation(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner,
+void UCombatComponent::HandleAbilityUsage_Implementation(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner, APawn* Instigator,
 	const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats)
 {
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.Owner = GetOwner();
 	TSubclassOf<ABaseAbility> AbilityToSpawn = GetAbilityBySlot(AttachedSlot);
-	ABaseAbility* SpawnedAbility = GetWorld()->SpawnActorDeferred<ABaseAbility>(AbilityToSpawn, SpawnTransform, Owner,
-		nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	ABaseAbility* SpawnedAbility = GetWorld()->SpawnActorDeferred<ABaseAbility>(AbilityToSpawn, SpawnTransform, Owner, Instigator, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 	if(SpawnedAbility)
 	{
