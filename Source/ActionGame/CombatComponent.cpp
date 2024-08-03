@@ -105,7 +105,7 @@ void UCombatComponent::ReplicatePlayerStatMapWorkAround()
 
 
 void UCombatComponent::HandleAbilityUsage_Implementation(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner, APawn* Instigator,
-const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats)
+const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats, int SkillLevel)
 {
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.Owner = GetOwner();
@@ -116,6 +116,7 @@ const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats)
 	{
 		SpawnedAbility->AttachedSlot = AttachedSlot;
 		SpawnedAbility->OwningPlayerStatMap = CurrentPlayerStats;
+		SpawnedAbility->SkillLevel = SkillLevel;
 		
 		UGameplayStatics::FinishSpawningActor(SpawnedAbility, SpawnTransform);
 	}

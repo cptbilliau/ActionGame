@@ -173,7 +173,8 @@ public:
 	void ReplicatePlayerStatMapWorkAround();
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void HandleAbilityUsage(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner, APawn* Instigator, const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats);
+	void HandleAbilityUsage(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner,
+		APawn* Instigator, const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats, int SkillLevel);
 
 	
 private:

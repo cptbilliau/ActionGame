@@ -60,6 +60,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FString Name;
+
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
 	float Speed;
@@ -114,6 +116,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Replicated, meta = (ExposeOnSpawn=true))
 	EAbilitySlot AttachedSlot;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true", ExposeOnSpawn=true))
+	int SkillLevel;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	void GetAbilityDamage(float& DamageOut);
