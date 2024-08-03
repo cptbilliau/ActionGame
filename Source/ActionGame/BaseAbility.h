@@ -131,9 +131,11 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	UPROPERTY(Replicated)
 	float PlayerDevotion;
+	UPROPERTY(Replicated)
 	float PlayerMight;
+	UPROPERTY(Replicated)
 	float PlayerMagic;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; 

@@ -25,7 +25,9 @@ void ABaseAbility::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	FDoRepLifetimeParams SharedParams;
 	SharedParams.bIsPushBased = true;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ABaseAbility, AttachedSlot, SharedParams);
-	
+	DOREPLIFETIME_WITH_PARAMS_FAST(ABaseAbility, PlayerDevotion, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(ABaseAbility, PlayerMagic, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(ABaseAbility, PlayerMight, SharedParams);
 }
 
 void ABaseAbility::OnConstruction(const FTransform& Transform)
@@ -42,33 +44,7 @@ void ABaseAbility::BeginPlay()
 	Super::BeginPlay();
 
 	
-	FReplicatedCurrentStat_Stat_Float* FoundPlayerDevotion = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Devotion);
-	if (FoundPlayerDevotion)
-	{
-		PlayerDevotion = FoundPlayerDevotion->currentStat;
-	}
-	else
-	{
-		PlayerDevotion = 0.0f;	
-	}
-	FReplicatedCurrentStat_Stat_Float* FoundPlayerMight = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Might);
-	if(FoundPlayerMight)
-	{
-		PlayerMight = FoundPlayerMight->currentStat;
-	}
-	else
-	{
-		PlayerMight = 0.0f;
-	}
-	FReplicatedCurrentStat_Stat_Float* FoundPlayerMagic = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Magic);
-	if(FoundPlayerMagic)
-	{
-		PlayerMagic = FoundPlayerMagic->currentStat;
-	}
-	else
-	{
-		PlayerMagic = 0.0f;
-	}
+
 }
 
 
@@ -78,14 +54,53 @@ void ABaseAbility::GetAbilityDamage(float& DamageOut)
 	if (GetOwner() != nullptr)
 	{
 
+		FReplicatedCurrentStat_Stat_Float* FoundPlayerDevotion = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Devotion);
+		if (FoundPlayerDevotion)
+		{
+			PlayerDevotion = FoundPlayerDevotion->currentStat;
+			
+		}
+
+		FReplicatedCurrentStat_Stat_Float* FoundPlayerMight = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Might);
+		if(FoundPlayerMight)
+		{
+			PlayerMight = FoundPlayerMight->currentStat;
+		}
+
+		FReplicatedCurrentStat_Stat_Float* FoundPlayerMagic = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Magic);
+		if(FoundPlayerMagic)
+		{
+			PlayerMagic = FoundPlayerMagic->currentStat;
+		}
+
 		DamageOut = BaseDamage+(PlayerDevotion*DevotionScaling/100)+(PlayerMagic*MagicScaling/100)+(PlayerMight*MightScaling/100);
 	}
 }
 
 void ABaseAbility::GetAbilityHealing(float& HealingOut)
 {
+	FReplicatedCurrentStat_Stat_Float* FoundPlayerDevotion = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Devotion);
+	if (FoundPlayerDevotion)
+	{
+		PlayerDevotion = FoundPlayerDevotion->currentStat;
+		
+	}
+
+	FReplicatedCurrentStat_Stat_Float* FoundPlayerMight = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Might);
+	if(FoundPlayerMight)
+	{
+		PlayerMight = FoundPlayerMight->currentStat;
+	}
+
+	FReplicatedCurrentStat_Stat_Float* FoundPlayerMagic = OwningPlayerStatMap.FindByKey(EPlayerStats::E_Magic);
+	if(FoundPlayerMagic)
+	{
+		PlayerMagic = FoundPlayerMagic->currentStat;
+	}
+
 	if (GetOwner() != nullptr)
 	{
+		
 		HealingOut = BaseHealing+(PlayerDevotion*DevotionHealScaling/100)+(PlayerMagic*MagicHealScaling/100);
 	} 
 }

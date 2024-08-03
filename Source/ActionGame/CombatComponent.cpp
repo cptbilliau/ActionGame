@@ -105,11 +105,10 @@ void UCombatComponent::ReplicatePlayerStatMapWorkAround()
 
 
 void UCombatComponent::HandleAbilityUsage_Implementation(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner, APawn* Instigator,
-const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats, int SkillLevel)
+const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats, int SkillLevel, TSubclassOf<ABaseAbility> AbilityToSpawn)
 {
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.Owner = GetOwner();
-	TSubclassOf<ABaseAbility> AbilityToSpawn = GetAbilityBySlot(AttachedSlot);
 	ABaseAbility* SpawnedAbility = GetWorld()->SpawnActorDeferred<ABaseAbility>(AbilityToSpawn, SpawnTransform, Owner, Instigator, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 	if(SpawnedAbility)
@@ -117,7 +116,10 @@ const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats, int SkillLe
 		SpawnedAbility->AttachedSlot = AttachedSlot;
 		SpawnedAbility->OwningPlayerStatMap = CurrentPlayerStats;
 		SpawnedAbility->SkillLevel = SkillLevel;
-		
+		FString  AbilityName = SpawnedAbility->GetName();
+		FString healthMessage = FString::Printf(TEXT("Spawned %s"), *AbilityName);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+ 
 		UGameplayStatics::FinishSpawningActor(SpawnedAbility, SpawnTransform);
 	}
 	

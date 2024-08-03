@@ -174,7 +174,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void HandleAbilityUsage(FTransform SpawnTransform, EAbilitySlot AttachedSlot, AActor* Owner,
-		APawn* Instigator, const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats, int SkillLevel);
+		APawn* Instigator, const TArray<FReplicatedCurrentStat_Stat_Float>& CurrentPlayerStats, int SkillLevel, TSubclassOf<ABaseAbility> AbilityToSpawn);
 
 	
 private:
