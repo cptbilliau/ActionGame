@@ -80,9 +80,9 @@ struct ACTIONGAME_API FEquipmentStatStruct
 USTRUCT(BlueprintType)
 struct FReplicatedCurrentStat_Stat_Float
 {
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	EPlayerStats Stat;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	float currentStat;
 	bool operator==(const EPlayerStats& StatType) const
 	{
@@ -95,9 +95,9 @@ struct FReplicatedCurrentStat_Stat_Float
 USTRUCT(BlueprintType)
 struct FReplicatedBaseStat_Stat_Float
 {
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	EPlayerStats Stat;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FStatStruct BaseStat;
 	bool operator==(const EPlayerStats& StatType) const
 	{
