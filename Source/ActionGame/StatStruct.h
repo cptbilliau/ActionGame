@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MetasoundSource.h"
 #include "StatStruct.generated.h"
+class ABaseBasicAttack;
 /**
  * 
  */
@@ -107,5 +109,43 @@ struct FReplicatedBaseStat_Stat_Float
 	FReplicatedBaseStat_Stat_Float();
 	~FReplicatedBaseStat_Stat_Float();
 };
+USTRUCT(BlueprintType)
+struct FWeaponItemData: public FTableRowBase  
+{
+	UPROPERTY(BlueprintReadWrite)
+	TSoftClassPtr<ABaseBasicAttack> Ability;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Range;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SizeAngle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Cooldown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BaseDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MightScaling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MagicScaling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DevotionScaling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMetaSoundSource* WeaponAudio;
+	
+
+	GENERATED_BODY()
+	FWeaponItemData();
+	~FWeaponItemData();
+	
+};
 

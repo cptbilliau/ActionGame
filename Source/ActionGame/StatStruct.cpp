@@ -43,3 +43,13 @@ FReplicatedBaseStat_Stat_Float::~FReplicatedBaseStat_Stat_Float()
 {
 }
 
+FWeaponItemData::FWeaponItemData()
+{
+	
+}
+FWeaponItemData::~FWeaponItemData()
+{
+	
+}
+
+

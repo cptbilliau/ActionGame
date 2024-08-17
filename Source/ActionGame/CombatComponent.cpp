@@ -53,6 +53,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, SkillSlot1);
 	DOREPLIFETIME(UCombatComponent, SkillSlot2);
 	DOREPLIFETIME(UCombatComponent, SkillSlot3);
+	DOREPLIFETIME(UCombatComponent, MainWeapon);
 }
 
 void UCombatComponent::OnRep_CurrentStatMapWorkaround()

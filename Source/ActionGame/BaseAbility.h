@@ -67,7 +67,7 @@ public:
 	float Speed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
-	float ProjectileSize;
+	float SizeAngle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Stats | Base", meta = (AllowPrivateAccess = "true"))
 	float Range;

@@ -147,6 +147,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Team")
 	int Team;
 
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "AbilityObjects ")
+	FWeaponItemData MainWeapon;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStats ")
 	TMap<EPlayerStats, FStatStruct> PlayerStatMap;
 

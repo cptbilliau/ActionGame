@@ -14,4 +14,13 @@ class ACTIONGAME_API ABaseBasicAttack : public ABaseAbility
 {
 	GENERATED_BODY()
 	
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void setStats();
+	
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	FWeaponItemData WeaponItemData;
+	
 };

@@ -9,6 +9,6 @@ public class ActionGame : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "NavigationSystem", "AIModule", "Niagara", "UMG", "NetCore"});
-		PrivateDependencyModuleNames.AddRange(new string[]{"CommonUI", "CommonUIEditor"});
+		PrivateDependencyModuleNames.AddRange(new string[]{"CommonUI", "CommonUIEditor", "MetasoundEngine", "MetasoundFrontend"});
 	}
 }
