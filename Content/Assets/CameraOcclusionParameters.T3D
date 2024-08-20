@@ -1,0 +1,8 @@
+Begin Object Class=/Script/Engine.MaterialParameterCollection Name="CameraOcclusionParameters" ExportPath="/Script/Engine.MaterialParameterCollection'/Game/StopAndBreathe/Materials/Shaders/CameraOcclusionParameters.CameraOcclusionParameters'"
+   StateId=5DE56D0E49387CCE85F7CABF789178FD
+   ScalarParameters(0)=(ParameterName="CameraOcclusionRuntime",Id=62D3B38045F992D5ACA946B2876D5488)
+   ScalarParameters(1)=(ParameterName="LowestOpacity",Id=7AB55D30415C159A212197910C45F41C)
+   ScalarParameters(2)=(DefaultValue=150.000000,ParameterName="CameraFadeLength",Id=3F28A31040F43D26BFE6EEACC0D884D9)
+   ScalarParameters(3)=(DefaultValue=750.000000,ParameterName="CameraFadeOffset",Id=5F33261F44CD72B75E2463A17C768649)
+   ScalarParameters(4)=(DefaultValue=1.000000,ParameterName="CameraDitherRandomness",Id=3261E84B4C3CB7BBBBB8D2AF5BA4B3AD)
+End Object
