@@ -218,7 +218,7 @@ TSubclassOf<ABaseAbility> UCombatComponent::GetAbilityBySlot(EAbilitySlot slot) 
 	switch (slot)
 	{
 	case EAbilitySlot::E_NONE:
-		//throw error do nothing
+		//do nothing
 		return nullptr;
 		
 	case EAbilitySlot::E_BasicAttack:
@@ -240,9 +240,9 @@ TSubclassOf<ABaseAbility> UCombatComponent::GetAbilityBySlot(EAbilitySlot slot) 
 		if(SkillSlot2 != nullptr)
 		return SkillSlot2.LoadSynchronous();
 		
-			return nullptr;
+		return nullptr;
 		
-		break;
+		
 	case EAbilitySlot::E_Slot3:
 		if(SkillSlot3 != nullptr)
 		return SkillSlot3.LoadSynchronous();
@@ -251,8 +251,10 @@ TSubclassOf<ABaseAbility> UCombatComponent::GetAbilityBySlot(EAbilitySlot slot) 
 
 	case EAbilitySlot::E_MovementSlot:
 		if(MovementSkill != nullptr)
-		return MovementSkill.LoadSynchronous();
-	
+		{
+			return MovementSkill.LoadSynchronous();
+		}
+		
 		return nullptr;
 	}
 	return nullptr;
@@ -266,25 +268,49 @@ void UCombatComponent::GetAbilityImageBySlot(EAbilitySlot slot, UTexture2D*& Out
 		//throw error do nothing
 		break;
 	case EAbilitySlot::E_BasicAttack:
-
-		OutImage = BasicAttack->GetDefaultObject<ABaseBasicAttack>()->SkillImage;
+		if (BasicAttack != nullptr)
+			OutImage = BasicAttack->GetDefaultObject<ABaseBasicAttack>()->SkillImage;
+		else
+		{
+			OutImage = nullptr;
+		}
 		break;
 
 	case EAbilitySlot::E_Slot1:
 		//SetSlot1Cooldowntimer
-		OutImage = SkillSlot1->GetDefaultObject<ABaseSkill>()->SkillImage;
+		if(SkillSlot1 !=nullptr)
+			OutImage = SkillSlot1->GetDefaultObject<ABaseSkill>()->SkillImage;
+		else
+		{
+			OutImage = nullptr;
+		}
 		break;
 	case EAbilitySlot::E_Slot2:
 		//SetSlot2Cooldowntimer
-		OutImage = SkillSlot2->GetDefaultObject<ABaseSkill>()->SkillImage;
+		if(SkillSlot2 !=nullptr)
+			OutImage = SkillSlot2->GetDefaultObject<ABaseSkill>()->SkillImage;
+		else
+		{
+			OutImage = nullptr;
+		}
 		break;
 	case EAbilitySlot::E_Slot3:
 		//SetSlot3Cooldowntimer
-		OutImage = SkillSlot3->GetDefaultObject<ABaseSkill>()->SkillImage;
+		if(SkillSlot3 !=nullptr)	
+			OutImage = SkillSlot3->GetDefaultObject<ABaseSkill>()->SkillImage;
+		else
+		{
+			OutImage = nullptr;
+		}
 		break;
 	case EAbilitySlot::E_MovementSlot:
 		//GetMovementImage
-		OutImage = MovementSkill->GetDefaultObject<ABaseSkill>()->SkillImage;
+		if(MovementSkill !=nullptr)
+			OutImage = MovementSkill->GetDefaultObject<ABaseSkill>()->SkillImage;
+		else
+		{
+			OutImage = nullptr;
+		}
 		break;
 	}
 
